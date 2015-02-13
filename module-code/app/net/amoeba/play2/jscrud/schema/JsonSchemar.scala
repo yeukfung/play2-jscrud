@@ -1,14 +1,13 @@
 package net.amoeba.play2.jscrud.schema
 
 import play.api.libs.json.JsObject
-import org.coursera.autoschema.AutoSchema
 import scala.reflect.runtime.{ universe => ru }
 
 object JsonSchemar {
 
-  def genSchema[T: ru.TypeTag]: JsObject = AutoSchema.createSchema[T]
+  def genSchema[T: ru.TypeTag]: JsObject = CustomAutoSchema.createSchema[T]
 
-  def genSchema(tpe: ru.Type): JsObject = AutoSchema.createSchema(tpe)
+  def genSchema(tpe: ru.Type): JsObject = CustomAutoSchema.createSchema(tpe)
 
   object JsonTransformHelper {
 

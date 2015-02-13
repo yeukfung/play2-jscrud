@@ -2,11 +2,13 @@ package models
 
 import play.api.libs.json.Json
 import net.amoeba.play2.jscrud.schema.JsonSchemar.JsonTransformHelper
+import java.util.Date
 
 case class Person(
   name: String,
   age: Option[Int],
-  gender: Option[String])
+  gender: Option[String],
+  birthday: Option[Date])
 
 object PersonFormats {
 
@@ -22,7 +24,6 @@ object PersonFormats {
     jstDescription("name", "give me your name") and
     jstMinLength("name", 5) and
     jstEnum("gender")("male", "female", "unknown") and
-    jstDefault("gender", "unknown")
-  ) reduce
+    jstDefault("gender", "unknown")) reduce
 
 }
