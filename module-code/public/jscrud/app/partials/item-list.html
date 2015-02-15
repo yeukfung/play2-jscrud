@@ -1,0 +1,27 @@
+
+<div class="container-fluid" ng-controller="ItemListController">
+	<div class="row">
+		<div class="col-md-2">
+			<!--Sidebar content-->
+
+			Search: <input ng-model="query"> Sort by: <select
+				ng-model="orderProp">
+				<option value="name">Alphabetical</option>
+				<option value="age">Newest</option>
+			</select>
+			
+		</div>
+		<div class="col-md-10">
+		
+			<!--Body content-->
+<a class="btn btn-default" href="#/new">Create</a>
+			<ul class="list">
+				<li ng-repeat="item in items | filter:query | orderBy:orderProp">
+					<a href="#/edit/{{item.id}}" class="btn btn-primary">edit</a>
+					{{item}} 
+					</li>
+			</ul>
+
+		</div>
+	</div>
+</div>
