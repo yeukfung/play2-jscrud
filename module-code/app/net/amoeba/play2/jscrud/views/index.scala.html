@@ -1,9 +1,22 @@
-@(schemaPath:String)
+@import net.amoeba.play2.jscrud.models.MenuItem
+@(title:String, jsonSchemaUrl:String, restUrl:String)(implicit rh:RequestHeader, menus:List[MenuItem])
 
-@main("crud") {
+@main(title, jsonSchemaUrl, restUrl) {
 
-<div ng-controller="FormController">
-    <form sf-schema="schema" sf-form="form" sf-model="model"></form>
-</div>
+
+@inc.menu(menus)
+
+            <!-- Right side column. Contains the navbar and content of the page -->
+            <div class="right-side">
+
+                <section class="content">
+					<div ng-view></div>
+                </section>
+            </div>
+            <div class="footer-main">
+                Copyright &copy Amoeba Consulting Ltd - JSCRUD, 2015
+            </div>
+
+
 
 }

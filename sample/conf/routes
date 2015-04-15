@@ -2,7 +2,12 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET   /crud/person         controllers.PersonCRUDAdmin.crud
+GET   /data/reload         controllers.Application.reloadDemoData
+
+GET   /crud/person/        controllers.PersonCRUDAdmin.jscrud
+GET   /crud/person2/       controllers.Person2CRUDAdmin.jscrud
+GET   /crud/               controllers.CRUDAdmin.indexPage
+
 GET   /jsonschema/person   controllers.PersonRestRouter.genJsSchema
 ->    /api/persons         controllers.PersonRestRouter			
 ->    /jscrud              jscrud.Routes

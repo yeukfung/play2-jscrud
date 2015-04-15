@@ -1,4 +1,6 @@
-name := """module-code"""
+organization  := """net.amoeba"""
+ 
+name := """play2-jscrud"""
 
 version := "1.0-SNAPSHOT"
 
