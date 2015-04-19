@@ -2,21 +2,28 @@ package net.amoeba.play2.jscrud.controllers
 
 import play.api.mvc.Controller
 import play.api.mvc.Action
+import play.api.libs.json._
 import scala.concurrent.Future
 import scala.reflect.runtime.{ universe => ru }
 import net.amoeba.play2.jscrud.schema.JsonSchemar
 import net.amoeba.play2.jscrud.models.MenuItem
+import net.amoeba.play2.jscrud.models.ColumnParam
+import net.amoeba.play2.jscrud.models.JSCRUDFormats
+import net.amoeba.play2.jscrud.models.JSCRUDParam
 
 abstract class JSCRUDAdminController extends Controller { this: JSCRUDSettings =>
-  def jsonSchemaUrl: String
-  def restUrl: String
+  
+  import JSCRUDFormats._
+  
   def title: String
-  def columns: Map[String, String]
-
   def menuItem: MenuItem
 
+  def jscrudParam:JSCRUDParam
+  
+  def dictionary:Map[String, Map[String, String]] = Map.empty
+  
   def jscrud = Action.async { implicit request =>
-    Future.successful(Ok(net.amoeba.play2.jscrud.views.html.index(title, jsonSchemaUrl, restUrl)))
+    Future.successful(Ok(net.amoeba.play2.jscrud.views.html.index(title, jscrudParam.copy(dictionary = dictionary))))
   }
 }
 

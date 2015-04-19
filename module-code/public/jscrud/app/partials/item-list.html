@@ -1,29 +1,16 @@
 
 <div class="container-fluid" ng-controller="ItemListController">
 	<div class="row">
-		<div class="col-md-2">
-			<!--Sidebar content-->
-
-			<div>
-				Search: <input ng-model="query">
-			</div>
-			<br/>
-			<div>
-				<a class="btn btn-default" href="#/new">Create</a>
-			</div>
-		</div>
-		<div class="col-md-10">
-
-			<!--Body content-->
-			<ul class="list">
-				<li ng-repeat="item in items | filter:query | orderBy:orderProp">
-					<a href="#/edit/{{item.id}}" class="btn btn-primary">edit</a> <br />
-					<div>
-						<pre class="prettyJs">{{prettyJs(item)}}</pre>
-					</div>
-				</li>
-			</ul>
-
+	<div class="col-md-8">
+		<h4>List</h4>
+	</div>
+	<div class="col-md-4 text-right">
+		<span><a href="#/new" class="btn btn-primary"><i class="fa fa-plus"></i> Create Record</a></span>
+	</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+		<table id="itemListTable" datatable="" dt-options="dtOptions" dt-columns="dtColumns" class="table table-striped table-bordered"></table>
 		</div>
 	</div>
 </div>

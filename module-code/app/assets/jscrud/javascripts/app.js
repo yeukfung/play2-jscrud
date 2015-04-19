@@ -1,118 +1,143 @@
-var app = angular.module('jscrud', [ 'schemaForm', 'ngRoute', 'ngResource' ,'jsonFormatter']);
+var app = angular.module('jscrud', ['schemaForm', 'ngRoute', 'ngResource', 'jsonFormatter', 'datatables', 'datatables.bootstrap', 'flash', 'oitozero.ngSweetAlert']);
 
 app.constant('cfg', {
-	jsonSchemaUrl : window.jsonSchemaUrl,
-	restUrl : window.restUrl,
-	baseAssetUrl : "../../jscrud/assets/"
+  jsonSchemaUrl: window.jsonSchemaUrl,
+  restUrl: window.restUrl,
+  columns: window.columns,
+  dictionary: window.dictionary,
+  baseAssetUrl: "../../jscrud/assets/"
 });
 
-app.factory('RestAPI', [ '$resource', 'cfg', function($resource, cfg) {
-	return $resource(cfg.restUrl, null, {
-		'update' : {
-			method : 'PUT',
-			params : {
-				id : '@id'
-			}
-		}
-	});
-} ]);
+app.factory('RestAPI', ['$resource', 'cfg', function($resource, cfg) {
+  return $resource(cfg.restUrl, null, {
+    'update': {
+      method: 'PUT',
+      params: {
+        id: '@id'
+      }
+    }
+  });
+}]);
 
-app.config([ '$routeProvider', '$resourceProvider', 'cfg',
-		function($routeProvider, $resourceProvider, cfg) {
-			var baseUrl = cfg.baseAssetUrl;
+app.config(['$routeProvider', '$resourceProvider', 'cfg', function($routeProvider, $resourceProvider, cfg) {
+  var baseUrl = cfg.baseAssetUrl;
 
-			$routeProvider.when('/', {
-        templateUrl : baseUrl + 'app/partials/item-list.html',
-        controller : 'ItemListController'
-      }).when('', {
-        templateUrl : baseUrl + 'app/partials/item-list.html',
-        controller : 'ItemListController'
-      }).when('/edit/:id', {
-				templateUrl : baseUrl + '/app/partials/item-detail.html',
-				controller : 'ItemDetailController'
-			}).when('/new', {
-				templateUrl : baseUrl + '/app/partials/item-detail.html',
-				controller : 'ItemDetailController'
-			}).otherwise({
-				redirectTo : '/'
-			});
-			$resourceProvider.defaults.stripTrailingSlashes = false;
+  $routeProvider.when('/', {
+    templateUrl: baseUrl + 'app/partials/item-list.html',
+    controller: 'ItemListController'
+  }).when('', {
+    templateUrl: baseUrl + 'app/partials/item-list.html',
+    controller: 'ItemListController'
+  }).when('/edit/:id', {
+    templateUrl: baseUrl + '/app/partials/item-detail.html',
+    controller: 'ItemDetailController'
+  }).when('/new', {
+    templateUrl: baseUrl + '/app/partials/item-detail.html',
+    controller: 'ItemDetailController'
+  }).otherwise({
+    redirectTo: '/'
+  });
+  $resourceProvider.defaults.stripTrailingSlashes = false;
 
-		} ]);
+}]);
 
-app.controller('ItemListController', [ '$scope', 'RestAPI',
-		function($scope, RestAPI) {
-			$scope.items = RestAPI.query();
+app.controller('ItemListController', ['$scope', 'cfg', 'RestAPI', 'DTOptionsBuilder', 'DTColumnBuilder', 'DTInstances', 'Flash', function($scope, cfg, RestAPI, DTOptionsBuilder, DTColumnBuilder, DTInstances, Flash) {
+  $scope.items = RestAPI.query();
 
-			$scope.prettyJs = function(js) {
-				return JSON.stringify(js, undefined, 1).trim() ;
-			}
-		} ]);
+  function newPromiseFn() {
+    return RestAPI.query().$promise;
+  }
 
-app.controller('ItemDetailController', [ '$scope', '$http', '$routeParams',
-		'RestAPI', '$location', 'cfg',
-		function($scope, $http, $routeParams, RestAPI, $location, cfg) {
-			$http.get(cfg.jsonSchemaUrl).success(function(data) {
-				$scope.schema = data;
-			});
+  $scope.dtOptions = DTOptionsBuilder.fromFnPromise(newPromiseFn).withOption('processing', true).withPaginationType('full_numbers').withBootstrap();
 
-			$scope.schema = {};
+  var cols = [];
+  for ( var key in cfg.columns) {
+    if (cfg.dictionary[key] == null)
+      cols.push(DTColumnBuilder.newColumn(key).withTitle(cfg.columns[key].title).withOption('defaultContent', '-'));
+    else
+      cols.push(DTColumnBuilder.newColumn(key).withTitle(cfg.columns[key].title).withOption('defaultContent', '-').renderWith(function(dataId, type, full) {
+        if (dataId)
+          return cfg.dictionary[key][dataId];
+        else
+          return null;
+      }));
+  }
 
-			$scope.form = [ "*", {
-				"type" : "actions",
-				"items" : [ {
-					"type" : "submit",
-					"style" : "btn-info",
-					"title" : "Save"
-				}, {
-					"type" : "button",
-					"style" : "btn-danger",
-					"title" : "Delete",
-					"onClick" : "onDelete()"
-				} ]
-			} ];
+  cols.push(DTColumnBuilder.newColumn("action").withClass("width-xs").withTitle(" ").renderWith(function(data, type, full) {
+    return '<a href="#/edit/' + full.id + '"><i class="fa fa-edit"></i></a>';
+  }));
+  $scope.dtColumns = cols;
 
-			var itemId = $routeParams.id;
+  // $scope.prettyJs = function(js) {
+  // return JSON.stringify(js, undefined, 1).trim();
+  // }
+}]);
 
-			if (itemId) {
-				$scope.sectionTitle = "Edit"
-				$scope.model = RestAPI.get({
-					id : itemId
-				}, function() {
-					// good code
-				}, function(response) {
-					// 404 or bad
-					if (response.status === 404) {
-						$location.path('/');
-					}
-				});
-			} else {
-				$scope.sectionTitle = "Add new"
-				$scope.model = {};
-			}
+app.controller('ItemDetailController', ['$scope', '$http', '$routeParams', 'RestAPI', '$location', 'cfg', 'Flash', 'SweetAlert', function($scope, $http, $routeParams, RestAPI, $location, cfg, Flash, SweetAlert) {
+  $http.get(cfg.jsonSchemaUrl).success(function(data) {
+    $scope.schema = data.schema;
+    $scope.form = data.schemaForm;
+  });
 
-			$scope.onSave = function(form, model) {
-			    $scope.$broadcast('schemaFormValidate');
+  $scope.schema = {};
 
-				if (form.$valid) {
-					if ($scope.model.id) {
-					  RestAPI.update($scope.model);
-					} else {
-					  RestAPI.save($scope.model, function(result) {
-							$location.path('/edit/' + result.id);
-						});
-					}
-				}
-			}
+  $scope.form = [];
 
-			$scope.onDelete = function() {
-				if ($scope.model.id) {
-				  RestAPI.remove($scope.model);
-				}
-				$location.path('/');
-			}
+  var itemId = $routeParams.id;
 
-			$scope.sayNo = function() {
-				alert("oh no!");
-			}
-		} ]);
+  if (itemId) {
+    $scope.sectionTitle = "Edit Item"
+    $scope.model = RestAPI.get({
+      id: itemId
+    }, function() {
+      // good code
+    }, function(response) {
+      // 404 or bad
+      if (response.status === 404) {
+        $location.path('/');
+      }
+    });
+  } else {
+    $scope.sectionTitle = "Add Item"
+    $scope.model = {};
+  }
+
+  $scope.onSave = function(form, model) {
+    $scope.$broadcast('schemaFormValidate');
+
+    if (form.$valid) {
+      if ($scope.model.id) {
+        RestAPI.update($scope.model, function(result) {
+          Flash.create("success", "item updated!");
+        });
+      } else {
+        RestAPI.save($scope.model, function(result) {
+          Flash.create("success", "item saved!");
+          $location.path('/edit/' + result.id);
+        });
+      }
+    }
+  }
+
+  $scope.onDelete = function() {
+    SweetAlert.swal({
+      title: "Are you sure?",
+      text: "Your will not be able to recover this item!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Yes, delete it!",
+      closeOnConfirm: true
+    }, function(confirmDelete) {
+      if (confirmDelete) {
+        if ($scope.model.id) {
+          RestAPI.remove($scope.model);
+        }
+        $location.path('/');
+        Flash.create("danger", "item removed!");
+      }
+    });
+
+  }
+
+}]);

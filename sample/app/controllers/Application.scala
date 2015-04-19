@@ -9,15 +9,15 @@ import java.util.Date
 
 object Application extends Controller {
 
-  def reloadDemoData = Action.async {
-    val personDao = controllers.PersonRestRouter.resController.res
-    personDao.batchDelete(Json.obj()) map { le =>
-      (1 to 100).foreach { i =>
-        personDao.insert(Person("name" + i, None, None, None))
-      }
+  def reloadDemoData = Action {
+//    val personDao = controllers.PersonRestRouter.resController.res
+//    personDao.batchDelete(Json.obj()) map { le =>
+//      (1 to 100).foreach { i =>
+//        personDao.insert(Person("name" + i, None, None, None))
+//      }
 
       Ok("done")
-    }
+//    }
   }
 
 }

@@ -1,7 +1,7 @@
-@import net.amoeba.play2.jscrud.models.MenuItem
-@(title:String, jsonSchemaUrl:String, restUrl:String)(implicit rh:RequestHeader, menus:List[MenuItem])
+@import net.amoeba.play2.jscrud.models._
+@(title:String, jscrudParam:JSCRUDParam)(implicit rh:RequestHeader, menus:List[MenuItem])
 
-@main(title, jsonSchemaUrl, restUrl) {
+@main(title, Some(jscrudParam)) {
 
 
 @inc.menu(menus)
@@ -10,6 +10,13 @@
             <div class="right-side">
 
                 <section class="content">
+                <div class="row">
+				<div class="col-xs-6"></div>
+				<div class="col-xs-6"><div flash-message="2000" ></div></div>                
+                </div>
+<!-- 5000 milli-secs is the display duration.
+     Flash alert will be automatically dismissed after 2000 milli-secs.
+-->
 					<div ng-view></div>
                 </section>
             </div>

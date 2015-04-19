@@ -8,9 +8,11 @@ case class Person(
   name: String,
   age: Option[Int],
   gender: Option[String],
-  birthday: Option[Date])
+  birthday: Option[Date],
+  group:Option[String],
+  roles:Option[List[String]]) 
 
-object PersonFormats {
+object PersonFormat {
 
   implicit val personFormat = Json.format[Person]
 

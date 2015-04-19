@@ -16,8 +16,31 @@ trait JsonSchemaGenMixin {
 
   def schemaTransformer: Reads[JsObject] = __.read[JsObject]
 
+  def schemaFormFields: JsArray = Json.parse("""["*"]""").as[JsArray]
+
+  def schemaFormActions: JsArray = Json.parse("""[{
+    "type": "actions",
+    "items": [{
+      "type": "submit",
+      "style": "btn-info",
+      "title": "Save"
+    }, {
+      "type": "button",
+      "style": "btn-danger",
+      "title": "Delete",
+      "onClick": "onDelete()"
+    }]
+  }]""").as[JsArray]
+
+  def schemaForm: JsArray = schemaFormFields ++ schemaFormActions
+
   def genJsSchema = Action.async {
-    Future.successful(Ok(
-      JsonSchemar.genSchema(tpe).transform(schemaTransformer).get))
+    Future.successful {
+      val schema = Json.obj("schema" -> JsonSchemar.genSchema(tpe).transform(schemaTransformer).get)
+      val form = Json.obj("schemaForm" -> schemaForm)
+      Ok(schema ++ form)
+
+    }
   }
+
 }

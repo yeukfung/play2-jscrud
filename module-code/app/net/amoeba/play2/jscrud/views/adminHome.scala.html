@@ -1,7 +1,7 @@
 @import net.amoeba.play2.jscrud.models.MenuItem
 @(title:String)(implicit rh:RequestHeader, menus:List[MenuItem])
 
-@main("MasterData", "", "") {
+@main("MasterData", None) {
 
 @inc.menu(menus)
 
