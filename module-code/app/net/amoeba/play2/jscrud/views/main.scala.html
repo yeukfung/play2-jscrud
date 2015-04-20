@@ -38,8 +38,8 @@
 <script>
 	window.jsonSchemaUrl = "@jscrudParam.map(_.schemaUrl).getOrElse("")"; 
 	window.restUrl = "@jscrudParam.map(_.restUrl).getOrElse("")";
-	window.columns = @Html(jscrudParam.map(_.columnsAsJson.toString).getOrElse(""));
-	window.dictionary = @Html(jscrudParam.map(_.dictionaryAsJson.toString).getOrElse(""));
+	window.columns = @Html(jscrudParam.map(_.columnsAsJson.toString).getOrElse("[]"));
+	window.dictionary = @Html(jscrudParam.map(_.dictionaryAsJson.toString).getOrElse("{}"));
 </script>
 
     </head>

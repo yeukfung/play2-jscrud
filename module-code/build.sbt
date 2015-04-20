@@ -1,3 +1,5 @@
+import play.PlayImport.PlayKeys._
+
 organization  := """net.amoeba"""
  
 name := """play2-jscrud"""
@@ -27,3 +29,5 @@ libraryDependencies ++= Seq(
 libraryDependencies += "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23"
 
 libraryDependencies += "org.coursera" %% "autoschema" % "0.1"
+
+packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)

@@ -20,6 +20,7 @@ GET   /jsonschema/role     controllers.RoleRestRouter.genJsSchema
 
 GET   /crud/               controllers.CRUDAdmin.indexPage
 
+GET   /admin/logout        controllers.CRUDAdmin.logout
 
 
 ->    /jscrud              jscrud.Routes

@@ -20,19 +20,19 @@ app.factory('RestAPI', ['$resource', 'cfg', function($resource, cfg) {
 }]);
 
 app.config(['$routeProvider', '$resourceProvider', 'cfg', function($routeProvider, $resourceProvider, cfg) {
-  var baseUrl = cfg.baseAssetUrl;
+//  var baseUrl = cfg.baseAssetUrl;
 
   $routeProvider.when('/', {
-    templateUrl: baseUrl + 'app/partials/item-list.html',
+    templateUrl: '/itemList.html',
     controller: 'ItemListController'
   }).when('', {
-    templateUrl: baseUrl + 'app/partials/item-list.html',
+    templateUrl: '/itemList.html',
     controller: 'ItemListController'
   }).when('/edit/:id', {
-    templateUrl: baseUrl + '/app/partials/item-detail.html',
+    templateUrl: '/itemDetail.html',
     controller: 'ItemDetailController'
   }).when('/new', {
-    templateUrl: baseUrl + '/app/partials/item-detail.html',
+    templateUrl: '/itemDetail.html',
     controller: 'ItemDetailController'
   }).otherwise({
     redirectTo: '/'
